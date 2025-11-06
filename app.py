@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-import pickle
 import os
 
 app = Flask(__name__)
@@ -12,11 +11,16 @@ UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Load class mapping and trained model
+# Load class mapping
 index_to_class = np.load('index_to_class.npy', allow_pickle=True).item()
 
-with open('tomato_disease_cnn.pkl', 'rb') as f:
-    model = pickle.load(f)
+# Load TFLite model
+interpreter = tf.lite.Interpreter(model_path="tomato_disease_cnn.tflite")
+interpreter.allocate_tensors()
+
+# Get input and output details
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 @app.route('/')
 def home():
@@ -41,20 +45,19 @@ def predict():
         img_array = np.array(img, dtype=np.float32) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
 
-        # Predict
-        predictions = model.predict(img_array)
+        # Run inference using TFLite
+        interpreter.set_tensor(input_details[0]['index'], img_array)
+        interpreter.invoke()
+        predictions = interpreter.get_tensor(output_details[0]['index'])
+
+        # Get prediction result
         class_index = np.argmax(predictions)
         class_name = index_to_class[class_index]
         confidence = float(np.max(predictions))
 
         result_text = f"🌿 <b>Predicted Class:</b> {class_name}<br>🔹 <b>Confidence:</b> {confidence:.2%}"
 
-        # Render same page with image and result
-        return render_template(
-            'index.html',
-            result=result_text,
-            image_path=filepath
-        )
+        return render_template('index.html', result=result_text, image_path=filepath)
 
     except Exception as e:
         return render_template('index.html', result=f"⚠️ Error: {str(e)}")

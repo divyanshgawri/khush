@@ -1,61 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>🍅 Tomato Disease Detection</title>
+    <meta charset="UTF-8">
+    <title>Tomato Disease Detector</title>
     <style>
         body {
+            font-family: 'Poppins', sans-serif;
+            background: #e9f5ec;
             text-align: center;
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
         }
         h1 {
+            color: #2b7a0b;
             margin-top: 40px;
         }
         form {
-            margin-top: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: inline-block;
+            padding: 30px;
+            margin-top: 20px;
         }
         input[type="file"] {
-            padding: 10px;
+            margin: 10px 0;
         }
         button {
-            padding: 10px 25px;
-            margin-top: 15px;
-            background-color: #4CAF50;
+            background: #2b7a0b;
             color: white;
             border: none;
+            padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
         }
         button:hover {
-            background-color: #45a049;
+            background: #226608;
+        }
+        img {
+            margin-top: 20px;
+            width: 256px;
+            border-radius: 12px;
         }
         .result {
             margin-top: 20px;
             font-size: 18px;
-        }
-        img {
-            margin-top: 25px;
+            background: #fff;
+            display: inline-block;
+            padding: 15px;
             border-radius: 12px;
-            max-width: 400px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-    <h1>🍅 Tomato Disease Detection</h1>
-    <form action="/predict" method="post" enctype="multipart/form-data">
+    <h1>🍅 Tomato Disease Detector</h1>
+    <form action="/predict" method="POST" enctype="multipart/form-data">
         <input type="file" name="file" accept="image/*" required><br>
-        <button type="submit">Predict</button>
+        <button type="submit">Predict Disease</button>
     </form>
 
     {% if image_path %}
+    <div>
         <img src="{{ image_path }}" alt="Uploaded Image">
+    </div>
     {% endif %}
 
     {% if result %}
-        <div class="result">
-            <p>{{ result|safe }}</p>
-        </div>
+    <div class="result">
+        {{ result | safe }}
+    </div>
     {% endif %}
 </body>
 </html>
