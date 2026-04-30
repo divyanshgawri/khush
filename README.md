@@ -1,156 +1,137 @@
-# 🍅 Tomato Leaf Disease Classification
+# Tomato Leaf Disease Classifier
 
-### Deep Learning Project using PlantVillage Tomato Dataset
-
-This project aims to build a **deep learning model** that can classify tomato leaf diseases from images using the **PlantVillage dataset**. The dataset contains 10 tomato classes — 9 disease categories and 1 healthy category.
-The model is built using **TensorFlow** and **EfficientNetB0**, achieving high accuracy on plant disease recognition.
+> A deep learning pipeline for identifying tomato leaf diseases from images, built on **EfficientNetB0** and trained on the PlantVillage dataset across 10 classes — 9 disease categories and 1 healthy baseline.
 
 ---
 
-## 📌 Project Objectives
+## Overview
 
-* Train a robust **image classification model** for tomato leaf diseases
-* Use **EfficientNetB0** for feature extraction and fine-tuning
-* Provide a clean, modular pipeline for:
-
-  * Dataset preparation
-  * Training
-  * Validation
-  * Testing
-  * Single image prediction
-* Deployable model (Flask/TF-Lite ready)
+Crop disease detection at scale is a hard problem. This project provides a clean, modular image classification pipeline that can identify 10 tomato leaf conditions from a single photo, with a model architecture tuned for high accuracy and lightweight enough to deploy on mobile or edge devices via TensorFlow Lite.
 
 ---
 
-## 📂 Dataset Information
+## Classes
 
-You filtered the dataset to include only **tomato leaf classes** from PlantVillage:
+The model is trained exclusively on tomato leaf data filtered from the PlantVillage dataset:
+
+| # | Class |
+|---|-------|
+| 1 | Bacterial Spot |
+| 2 | Early Blight |
+| 3 | Late Blight |
+| 4 | Leaf Mold |
+| 5 | Septoria Leaf Spot |
+| 6 | Spider Mites (Two-spotted) |
+| 7 | Target Spot |
+| 8 | Tomato Mosaic Virus |
+| 9 | Yellow Leaf Curl Virus |
+| 10 | Healthy |
+
+---
+
+## Model Architecture
+
+Built on **EfficientNetB0** pretrained on ImageNet, with a custom classification head:
 
 ```
-Tomato_Late_blight  
-Tomato_Leaf_Mold  
-Tomato_Septoria_leaf_spot  
-Tomato_Early_blight  
-Tomato_Spider_mites_Two_spotted_spider_mite  
-Tomato__Target_Spot  
-Tomato_Bacterial_spot  
-Tomato__Tomato_mosaic_virus  
-Tomato__Tomato_YellowLeaf__Curl_Virus  
-Tomato_healthy  
+EfficientNetB0 (frozen base — feature extraction)
+    └── GlobalAveragePooling2D
+    └── Dense(256, relu)
+    └── Dropout(0.3)
+    └── Dense(10, softmax)
 ```
 
-Total Classes → **10**
+**Training configuration:**
+- Optimizer: Adam
+- Loss: Categorical cross-entropy
+- Augmentation: Random rotation, zoom, horizontal/vertical flips
+- Baseline training: 10+ epochs with fine-tuning support
 
 ---
 
-## 🧱 Project Structure
+## Repository Structure
 
 ```
 Tomato-Disease-Classifier/
-│
 ├── Tomato_Dataset/
 │   ├── train/
 │   ├── val/
 │   └── test/
-│
 ├── src/
-│   ├── dataset_split.py
-│   ├── train_model.py
-│   ├── evaluate.py
-│   ├── predict.py
-│
+│   ├── dataset_split.py       # Splits raw dataset into train/val/test
+│   ├── train_model.py         # Model definition, training, and checkpointing
+│   ├── evaluate.py            # Metrics: accuracy, confusion matrix, loss curves
+│   └── predict.py             # Single-image inference via CLI
 ├── models/
 │   └── tomato_disease_classifier.h5
-│
-├── README.md
-└── requirements.txt
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
-## 🔧 Setup Instructions
+## Quick Start
 
-### 1️⃣ Install dependencies
+**1. Install dependencies**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2️⃣ Dataset Split (train/val/test)
+**2. Prepare the dataset**
 
-Run this script to organize dataset:
+Organizes raw PlantVillage tomato images into `train/`, `val/`, and `test/` splits:
 
 ```bash
 python src/dataset_split.py
 ```
 
-### 3️⃣ Train Model
+**3. Train the model**
 
 ```bash
 python src/train_model.py
 ```
 
-### 4️⃣ Evaluate Model
+**4. Evaluate performance**
+
+Outputs test accuracy, confusion matrix, and training curves:
 
 ```bash
 python src/evaluate.py
 ```
 
-### 5️⃣ Predict a Single Image
+**5. Run inference on a single image**
 
 ```bash
-python src/predict.py --image leaf.jpg
+python src/predict.py --image path/to/leaf.jpg
 ```
 
 ---
 
-## 🧠 Model Architecture
+## Results
 
-The model uses:
+| Metric | Value |
+|--------|-------|
+| Training Accuracy | — |
+| Validation Accuracy | — |
+| Test Accuracy | — |
 
-* **EfficientNetB0** (pretrained on ImageNet)
-* Frozen base layers for feature extraction
-* Custom classification head:
-
-  * GlobalAveragePooling
-  * Dense (256)
-  * Dropout (0.3)
-  * Dense (10, softmax)
-
-Training includes:
-
-* Data Augmentation (rotation, zoom, flips)
-* Adam optimizer
-* Categorical cross-entropy loss
-* 10+ epochs baseline training
+> Update this table after training. Evaluation artifacts (confusion matrix, loss/accuracy curves) are saved automatically by `evaluate.py`.
 
 ---
 
-## 📊 Results
+## Deployment
 
-Metrics evaluated:
+The trained model is ready for deployment across several targets:
 
-* Training accuracy
-* Validation accuracy
-* Test accuracy
-* Confusion matrix
-* Loss curves / accuracy curves
-
-
+- **TensorFlow Lite** — Convert `.h5` to `.tflite` for Android/iOS apps
+- **Flask / FastAPI** — Wrap the model in a REST endpoint for web integration
+- **ONNX** — Export for cross-platform and non-TensorFlow inference runtimes
+- **Mobile agriculture assistant** — Designed to run efficiently on-device
 
 ---
 
-
-## 🚀 Deployment Options
-
-* Export to **TensorFlow Lite** for mobile apps
-* Serve model through **Flask / FastAPI API**
-* Integrate into a **mobile agriculture assistant**
-* Use ONNX for cross-platform deployment
-
----
-
-## 📦 requirements.txt (Example)
+## Requirements
 
 ```
 tensorflow
@@ -159,6 +140,17 @@ numpy
 matplotlib
 scikit-learn
 ```
-* **PlantVillage** for providing high-quality agricultural datasets
-* **TensorFlow** for model development
-* **EfficientNet** authors (Google AI
+
+---
+
+## License
+
+Distributed under the [MIT License](LICENSE).
+
+---
+
+## Acknowledgments
+
+- **PlantVillage** — For the open-access, high-quality agricultural image dataset
+- **Google AI / EfficientNet authors** — For the EfficientNet architecture and pretrained weights
+- **TensorFlow team** — For the model development and deployment ecosystem
